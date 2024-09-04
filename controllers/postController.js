@@ -29,12 +29,16 @@ async function getPost(req, res) {
 }
 
 async function createPost(req, res) {
-    const { title, content } = req.body
+    const { title, content, userId } = req.body
+    if (!title || !content || !userId) {
+        return res.status(400).json({ message: "Title, content, and userId are required" });
+    }
     try{
         const newPost = await prisma.post.create({
             data: {
                 title,
-                content
+                content,
+                authorId: userId
             }
         })
         res.status(201).json(newPost)

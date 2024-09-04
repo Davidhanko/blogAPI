@@ -1,7 +1,8 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
-const passport = require('../modules/passport');
+const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
+const passport = require('../modules/passport');
 
 const prisma = new PrismaClient();
 
@@ -28,11 +29,7 @@ async function register(req, res) {
     }
 }
 
-async function login(req, res) {
-    passport.authenticate('local', { failureMessage: 'FAIL', successMessage: "SUCCESS" })
-}
 
 module.exports = {
-    register,
-    login
+    register
 };
