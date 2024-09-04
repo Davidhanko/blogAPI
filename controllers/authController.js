@@ -1,12 +1,13 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
+const passport = require('../modules/passport');
 const { validationResult } = require('express-validator');
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
-async function register(req, res){
+async function register(req, res) {
     const errors = validationResult(req);
-    if(!errors.isEmpty()){
+    if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
@@ -19,7 +20,7 @@ async function register(req, res){
                 email,
                 password: hashed_password
             }
-        })
+        });
 
         res.status(201).json({ message: 'User created successfully.' });
     } catch (error) {
@@ -28,10 +29,10 @@ async function register(req, res){
 }
 
 async function login(req, res) {
-    res.status(200).json({ message: 'Login successful' });
+    passport.authenticate('local', { failureMessage: 'FAIL', successMessage: "SUCCESS" })
 }
 
 module.exports = {
     register,
     login
-}
+};

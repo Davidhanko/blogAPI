@@ -1,6 +1,7 @@
-require('dotenv').config()
+require('dotenv').config();
 
 const authRouter = require('./routers/authRouter');
+const postRouter = require('./routers/postRouter');
 
 const passport = require('./modules/passport'); // Import passport from passport.js
 const express = require('express');
@@ -29,13 +30,13 @@ app.use(
 );
 
 app.use(passport.initialize());
-app.use(passport.session())
+app.use(passport.session());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/auth', authRouter);
+app.use('/post', postRouter);
 
 app.listen(process.env.port, () => {
     console.log('Server is running on port ' + process.env.port);
-})
-
+});

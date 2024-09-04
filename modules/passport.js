@@ -15,7 +15,7 @@ passport.use(new LocalStrategy(async function verify(username, password, cb) {
             return cb(null, false, { message: 'Incorrect username or password.' });
         }
 
-        const isMatch = await bcrypt.compare(password, user.hashed_password);
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return cb(null, false, { message: 'Incorrect username or password.' });
         }

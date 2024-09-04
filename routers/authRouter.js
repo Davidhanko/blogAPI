@@ -1,10 +1,9 @@
 const express = require('express');
-
-const {body} = require('express-validator');
-
+const { body } = require('express-validator');
+const authController = require('../controllers/authController');
+const passport = require("../modules/passport");
 
 const authRouter = express.Router();
-const authController = require('../controllers/authController');
 
 authRouter.post('/register',
     body("username")
@@ -19,7 +18,7 @@ authRouter.post('/register',
         .normalizeEmail()
         .withMessage("Invalid email address"),
     body("password")
-        .isLength({ min: 6, max: 20})
+        .isLength({ min: 6, max: 20 })
         .escape()
         .trim()
         .withMessage("Password must be between 6 and 20 characters long"),
@@ -31,16 +30,11 @@ authRouter.post('/register',
     }), authController.register);
 
 authRouter.post('/login',
-    body("username")
-        .notEmpty()
-        .trim()
-        .escape()
-        .withMessage("Username is required"),
-    body("password")
-        .notEmpty()
-        .trim()
-        .escape()
-        .withMessage("Password is required"),
-    authController.login);
+    passport.authenticate('local',
+        { failureRedirect: '/login', successRedirect: '/home'}),
+    (req, res) => {
+    res.status(500).json({message: "If you see this, you messed up really bad"})
+    }
+);
 
 module.exports = authRouter;
