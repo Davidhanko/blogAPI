@@ -29,17 +29,22 @@ async function getPost(req, res) {
 }
 
 async function createPost(req, res) {
-    const { title, content } = req.body
-    const userId = req.user.id
+    const { title, content} = req.body
+    let {published} = req.body
+    const userId = req.user.id; // Extracted from JWT payload
     if (!title || !content || !userId) {
         return res.status(400).json({ message: "Title, content, and userId are required" });
+    }
+    if(!published){
+        published = true;
     }
     try{
         const newPost = await prisma.post.create({
             data: {
                 title,
                 content,
-                authorId: userId
+                authorId: userId,
+                published: published
             }
         })
         res.status(201).json(newPost)
@@ -51,6 +56,8 @@ async function createPost(req, res) {
 
 async function updatePost(req, res){
     const { id, title, content} = req.body
+    const userId = req.user.id; // Extracted from JWT payload
+
     try{
         const post = await prisma.post.findUnique({
             where: {id}

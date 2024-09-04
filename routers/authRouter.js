@@ -50,9 +50,20 @@ authRouter.post('/login', function (req, res, next) {
 });
 
 authRouter.post('/refresh', function (req, res) {
-        const user = req.body
-        const newToken = jwt.sign({ id: user.id }, process.env.KEY, { expiresIn: '1h' });
+    const token = req.headers.authorization?.split(" ")[1];
+    const userId = req.body
+    if (!token) {
+        return res.status(401).json({ message: "No token provided" });
+    }
+    try {
+        const decoded = jwt.verify(token, process.env.KEY);
+        const newToken = jwt.sign({ id: decoded.id }, process.env.KEY, { expiresIn: '1h' });
         return res.json({ token: newToken });
+    } catch (e) {
+        // Generate a new token even if the provided token is invalid
+        const newToken = jwt.sign({id: userId}, process.env.KEY, { expiresIn: '1h' });
+        return res.json({ token: newToken });
+    }
 });
 
 

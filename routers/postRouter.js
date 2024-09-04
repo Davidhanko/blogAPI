@@ -1,18 +1,19 @@
 const express = require('express');
 
-const router = express.Router();
+const postRouter = express.Router();
 
+const JWTDecoder = require("../modules/decodeJWT")
 const postController = require('../controllers/postController');
 const passport = require("../modules/passport");
 
-router.get('/', postController.getAllPosts);
+postRouter.get('/', postController.getAllPosts);
 
-router.get('/:id', postController.getPost)
+postRouter.get('/:id', postController.getPost)
 
-router.post('/', passport.authenticate('jwt', {session: false}), postController.createPost);
+postRouter.post('/', passport.authenticate('jwt', {session: false}), JWTDecoder, postController.createPost);
 
-router.put("/", passport.authenticate('jwt', {session: false}), postController.updatePost)
+postRouter.put("/", passport.authenticate('jwt', {session: false}), JWTDecoder, postController.updatePost)
 
-router.delete("/", passport.authenticate('jwt', {session: false}), postController.deletePost)
+postRouter.delete("/", passport.authenticate('jwt', {session: false}), JWTDecoder, postController.deletePost)
 
-module.exports = router
+module.exports = postRouter
