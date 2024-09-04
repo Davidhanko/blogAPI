@@ -43,26 +43,16 @@ authRouter.post('/login', function (req, res, next) {
                 res.send(err);
             }
             // generate a signed son web token with the contents of user object and return it in the response
-            const token = jwt.sign(user, process.env.KEY, { expiresIn: '1h'});
+            const token = jwt.sign(user.id, process.env.KEY, { expiresIn: '1h'});
             return res.json({user, token});
         });
     })(req, res);
 });
 
-authRouter.post('/refresh-token', function (req, res) {
-    const { token } = req.body;
-    if (!token) {
-        return res.status(400).json({ message: 'Token is required' });
-    }
-
-    jwt.verify(token, process.env.KEY, (err, user) => {
-        if (err) {
-            return res.status(403).json({ message: 'Invalid or expired token' });
-        }
-
-        const newToken = jwt.sign({ id: user }, process.env.KEY, { expiresIn: '1h' });
+authRouter.post('/refresh', function (req, res) {
+        const user = req.body
+        const newToken = jwt.sign({ id: user.id }, process.env.KEY, { expiresIn: '1h' });
         return res.json({ token: newToken });
-    });
 });
 
 

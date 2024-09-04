@@ -5,7 +5,7 @@ const router = express.Router();
 const postController = require('../controllers/postController');
 const passport = require("../modules/passport");
 
-router.get('/all', postController.getAllPosts);
+router.get('/', postController.getAllPosts);
 
 router.get('/:id', postController.getPost)
 
