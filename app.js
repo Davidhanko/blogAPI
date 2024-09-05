@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const authRouter = require('./routers/authRouter');
 const postRouter = require('./routers/postRouter');
+const cors = require('cors')
 
 const passport = require('./modules/passport'); // Import passport from passport.js
 const express = require('express');
@@ -9,6 +10,14 @@ const expressSession = require('express-session');
 const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const { PrismaClient } = require('@prisma/client');
 const app = express();
+
+
+const corsOptions = {
+    optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+app.use(cors())
 
 app.use(
     expressSession({
