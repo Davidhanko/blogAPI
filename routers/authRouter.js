@@ -3,6 +3,8 @@ const { body } = require('express-validator');
 const authController = require('../controllers/authController');
 const passport = require("../modules/passport");
 const jwt = require("jsonwebtoken");
+const redis = require('redis')
+const client = redis.createClient();
 
 const authRouter = express.Router();
 
@@ -39,11 +41,32 @@ authRouter.post('/login', passport.authenticate('local', {
     }
 );
 
+authRouter.post('/logout', function (req, res){
+    const token = req.headers.authorization?.split(' ')[1]
+    if(!token){
+        return res.status(400).json({message: "No token provided"})
+    }
+    try{
+        const decoded = jwt.verify(token, process.env.KEY)
+        const expiresAt = decoded.exp
+        client.set(token, "blacklisted", 'EX', expiresAt - Math.floor(Date.now() / 1000))
+        res.status(200).json({message: "Logged out succesfully"})
+    }
+    catch (e){
+        res.status(401).json({message: "Invalid token"})
+    }
+})
+
 authRouter.post('/refresh', function (req, res) {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
         return res.status(401).json({ message: "No token provided" });
     }
+    client.get(token, (err, reply) => {
+        if (reply === 'blacklisted'){
+            return res.status(401).json({message: "Token is blacklisted"})
+        }
+    })
     try {
         const decoded = jwt.verify(token, process.env.KEY);
         res.status(200).json({message: "Token is valid"})
