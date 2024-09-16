@@ -44,7 +44,7 @@ authRouter.post('/login', function (req, res, next) {
             }
             // generate a signed son web token with the contents of user object and return it in the response
             const token = jwt.sign(user.id, process.env.KEY, { expiresIn: '1h'});
-            return res.json({user, token});
+            return res.status(200).json({user, token});
         });
     })(req, res);
 });
@@ -60,9 +60,7 @@ authRouter.post('/refresh', function (req, res) {
         const newToken = jwt.sign({ id: decoded.id }, process.env.KEY, { expiresIn: '1h' });
         return res.json({ token: newToken });
     } catch (e) {
-        // Generate a new token even if the provided token is invalid
-        const newToken = jwt.sign({id: userId}, process.env.KEY, { expiresIn: '1h' });
-        return res.json({ token: newToken });
+        res.status(404).json({message: "Logout"})
     }
 });
 

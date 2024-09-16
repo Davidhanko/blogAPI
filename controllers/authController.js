@@ -11,8 +11,6 @@ async function register(req, res) {
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    console.log(req.headers)
-    console.log(req.body)
     try {
         const { username, email, password } = req.body;
         const hashed_password = await bcrypt.hash(password, 10);
