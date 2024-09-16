@@ -34,23 +34,21 @@ authRouter.post('/login', passport.authenticate('local', {
         failureRedirect: '/login', session: false, failureFlash: true }),
     function (req, res) {
         const user = req.user;
-        const token = jwt.sign({ id: user.id }, process.env.KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id }, process.env.KEY, { expiresIn: '7d' });
         res.json({ user: user, token: token });
     }
 );
 
 authRouter.post('/refresh', function (req, res) {
     const token = req.headers.authorization?.split(" ")[1];
-    const userId = req.body
     if (!token) {
         return res.status(401).json({ message: "No token provided" });
     }
     try {
         const decoded = jwt.verify(token, process.env.KEY);
-        const newToken = jwt.sign({ id: decoded.id }, process.env.KEY, { expiresIn: '1h' });
-        return res.json({ token: newToken });
+        res.status(200).json({message: "Token is valid"})
     } catch (e) {
-        res.status(404).json({message: "Logout"})
+        res.status(401).json({message: "Logout"})
     }
 });
 
