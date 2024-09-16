@@ -63,6 +63,9 @@ authRouter.post('/refresh', function (req, res) {
         return res.status(401).json({ message: "No token provided" });
     }
     client.get(token, (err, reply) => {
+        if(err){
+            return res.status(500).json({message: "Redis error", error: err})
+        }
         if (reply === 'blacklisted'){
             return res.status(401).json({message: "Token is blacklisted"})
         }
