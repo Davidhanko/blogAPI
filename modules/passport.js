@@ -13,12 +13,12 @@ passport.use(new LocalStrategy(async function verify(username, password, cb) {
         });
 
         if (!user) {
-            return cb(null, false, { message: 'Incorrect username or password.' });
+            return cb(null, false, { message: 'Incorrect username.' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return cb(null, false, { message: 'Incorrect username or password.' });
+            return cb(null, false, { message: 'Incorrect password.' });
         }
 
         return cb(null, user);

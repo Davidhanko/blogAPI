@@ -30,24 +30,14 @@ authRouter.post('/register',
         return true;
     }), authController.register);
 
-authRouter.post('/login', function (req, res, next) {
-    passport.authenticate('local', {session: false}, (err, user, info) => {
-        if (err || !user) {
-            return res.status(400).json({
-                message: 'Something is not right',
-                user   : user
-            });
-        }
-        req.login(user, {session: false}, (err) => {
-            if (err) {
-                res.send(err);
-            }
-            // generate a signed son web token with the contents of user object and return it in the response
-            const token = jwt.sign(user.id, process.env.KEY, { expiresIn: '1h'});
-            return res.status(200).json({user, token});
-        });
-    })(req, res, next);
-});
+authRouter.post('/login', passport.authenticate('local', {
+        failureRedirect: '/login', session: false, failureFlash: true }),
+    function (req, res) {
+        const user = req.user;
+        const token = jwt.sign({ id: user.id }, process.env.KEY, { expiresIn: '1h' });
+        res.json({ user: user, token: token });
+    }
+);
 
 authRouter.post('/refresh', function (req, res) {
     const token = req.headers.authorization?.split(" ")[1];
