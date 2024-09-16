@@ -46,7 +46,7 @@ authRouter.post('/login', function (req, res, next) {
             const token = jwt.sign(user.id, process.env.KEY, { expiresIn: '1h'});
             return res.status(200).json({user, token});
         });
-    })(req, res);
+    })(req, res, next);
 });
 
 authRouter.post('/refresh', function (req, res) {
