@@ -52,4 +52,6 @@ authRouter.post('/refresh', async function (req, res) {
     }
 });
 
+authRouter.get('/userData', authController.getData)
+
 module.exports = authRouter;
