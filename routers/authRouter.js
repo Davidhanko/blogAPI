@@ -39,21 +39,6 @@ authRouter.post('/login', passport.authenticate('local', {
     }
 );
 
-//logout and refresh are the same in reality
-authRouter.post('/logout', async function (req, res){
-    const token = req.headers.authorization?.split(' ')[1];
-    if(!token){
-        return res.status(400).json({message: "No token provided"});
-    }
-    try{
-        const decoded = jwt.verify(token, process.env.KEY);
-        res.status(200).json({message: "Logged out successfully"});
-    }
-    catch (e){
-        res.status(401).json({message: "Invalid token"});
-    }
-});
-
 authRouter.post('/refresh', async function (req, res) {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
