@@ -29,24 +29,23 @@ async function register(req, res) {
     }
 }
 
-async function getData(req, res){
-    const token = req.headers.authorization?.split(" ")[1]
-    if(!token){
-        return res.status(401).json({message: "Token not provided"})
+async function getData(req, res) {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+        return res.status(401).json({ message: "Token not provided" });
     }
-    try{
-        const decoded = jwt.decode(token, process.env.KEY)
+    try {
+        const decoded = jwt.verify(token, process.env.KEY);
         const user = await prisma.user.findUnique({
-            where: {id: decoded.id},
-            select: {id: true, username: true, email: true, posts: true, comments: true, author: true, createdAt: true, updatedAt: true}
-        })
-        if(!user){
-            return res.status(404).json({message: "User not found"})
+            where: { id: decoded.id },
+            select: { id: true, username: true, email: true, posts: true, comments: true, author: true, createdAt: true, updatedAt: true }
+        });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
         }
-        res.status(200).json({userData: user})
-    }
-    catch (e) {
-        res.status(401).json({message: "Invalid token"})
+        res.status(200).json({ userData: user });
+    } catch (e) {
+        res.status(401).json({ message: "Invalid token" });
     }
 }
 
