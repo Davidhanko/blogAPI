@@ -3,8 +3,6 @@ const { body } = require('express-validator');
 const authController = require('../controllers/authController');
 const passport = require("../modules/passport");
 const jwt = require("jsonwebtoken");
-const redis = require('redis')
-const client = redis.createClient();
 
 const authRouter = express.Router();
 
@@ -41,42 +39,32 @@ authRouter.post('/login', passport.authenticate('local', {
     }
 );
 
-authRouter.post('/logout', function (req, res){
-    const token = req.headers.authorization?.split(' ')[1]
+//logout and refresh are the same in reality
+authRouter.post('/logout', async function (req, res){
+    const token = req.headers.authorization?.split(' ')[1];
     if(!token){
-        return res.status(400).json({message: "No token provided"})
+        return res.status(400).json({message: "No token provided"});
     }
     try{
-        const decoded = jwt.verify(token, process.env.KEY)
-        const expiresAt = decoded.exp
-        client.set(token, "blacklisted", 'EX', expiresAt - Math.floor(Date.now() / 1000))
-        res.status(200).json({message: "Logged out succesfully"})
+        const decoded = jwt.verify(token, process.env.KEY);
+        res.status(200).json({message: "Logged out successfully"});
     }
     catch (e){
-        res.status(401).json({message: "Invalid token"})
+        res.status(401).json({message: "Invalid token"});
     }
-})
+});
 
-authRouter.post('/refresh', function (req, res) {
+authRouter.post('/refresh', async function (req, res) {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
         return res.status(401).json({ message: "No token provided" });
     }
-    client.get(token, (err, reply) => {
-        if(err){
-            return res.status(500).json({message: "Redis error", error: err})
-        }
-        if (reply === 'blacklisted'){
-            return res.status(401).json({message: "Token is blacklisted"})
-        }
-    })
     try {
         const decoded = jwt.verify(token, process.env.KEY);
-        res.status(200).json({message: "Token is valid"})
+        res.status(200).json({message: "Token is valid"});
     } catch (e) {
-        res.status(401).json({message: "Logout"})
+        res.status(401).json({message: "Invalid token"});
     }
 });
-
 
 module.exports = authRouter;
